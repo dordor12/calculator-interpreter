@@ -6,7 +6,6 @@ import io.github.dordor12.calculator_interpreter.TokenMappingFactory.RecursiveTo
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
 
 public class TokenMappingFactoryTest {
 

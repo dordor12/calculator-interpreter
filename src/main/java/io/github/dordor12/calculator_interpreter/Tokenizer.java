@@ -56,7 +56,7 @@ public class Tokenizer {
             } else if (isAlpha(c)) {
                 token = identifier();
             } else {
-                log.error("Unexpected character. line: " + line, " char: " + c);
+                // log.error("Unexpected character. line: " + line, " char: " + c);
             }
         }
         return token;
@@ -80,7 +80,7 @@ public class Tokenizer {
         }
 
         return createToken(TokenType.NUMBER,
-                Double.parseDouble(source.substring(start, current)));
+                Float.parseFloat(source.substring(start, current)));
     }
 
     private Token identifier() {

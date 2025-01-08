@@ -47,9 +47,9 @@ public class TokenizerTest {
 
         assertEquals(3, tokens.size());
         assertEquals(TokenType.NUMBER, tokens.get(0).getType());
-        assertEquals(123.0, tokens.get(0).getValue());
+        assertEquals((float)123.0, tokens.get(0).getValue());
         assertEquals(TokenType.NUMBER, tokens.get(1).getType());
-        assertEquals(45.67, tokens.get(1).getValue());
+        assertEquals((float)45.67, tokens.get(1).getValue());
         assertEquals(TokenType.EOF, tokens.get(2).getType());
     }
 
@@ -106,13 +106,13 @@ public class TokenizerTest {
         assertEquals(TokenType.IDENTIFIER, tokens.get(0).getType());
         assertEquals("abc", tokens.get(0).getStringValue());
         assertEquals(TokenType.NUMBER, tokens.get(1).getType());
-        assertEquals(123.0, tokens.get(1).getValue());
+        assertEquals((float)123.0, tokens.get(1).getValue());
         assertEquals(TokenType.PLUS, tokens.get(2).getType());
         assertEquals(TokenType.MINUS, tokens.get(3).getType());
         assertEquals(TokenType.IDENTIFIER, tokens.get(4).getType());
         assertEquals("def", tokens.get(4).getStringValue());
         assertEquals(TokenType.NUMBER, tokens.get(5).getType());
-        assertEquals(45.67, tokens.get(5).getValue());
+        assertEquals((float)45.67, tokens.get(5).getValue());
         assertEquals(TokenType.EOF, tokens.get(6).getType());
     }
 

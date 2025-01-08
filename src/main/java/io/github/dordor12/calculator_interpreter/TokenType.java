@@ -20,7 +20,7 @@ public enum TokenType {
     MINUS_MINUS("--"),
     NEW_LINE("\n"),
     IDENTIFIER(null),
-    EOF("EOF");
+    EOF(null);
 
     public final String value;
 }
