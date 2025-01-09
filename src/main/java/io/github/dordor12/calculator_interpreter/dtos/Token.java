@@ -1,5 +1,6 @@
-package io.github.dordor12.calculator_interpreter;
+package io.github.dordor12.calculator_interpreter.dtos;
 
+import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

@@ -3,6 +3,7 @@ package io.github.dordor12.calculator_interpreter;
 import org.junit.jupiter.api.Test;
 
 import io.github.dordor12.calculator_interpreter.TokenMappingFactory.RecursiveTokenMap;
+import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
 
 import static org.junit.jupiter.api.Assertions.*;
 

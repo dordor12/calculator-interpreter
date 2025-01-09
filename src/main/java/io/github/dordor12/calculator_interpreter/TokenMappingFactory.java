@@ -2,6 +2,7 @@ package io.github.dordor12.calculator_interpreter;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -9,9 +10,13 @@ import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.github.dordor12.calculator_interpreter.operators.BinaryOperators;
-import io.github.dordor12.calculator_interpreter.operators.PostfixUnaryOperators;
-import io.github.dordor12.calculator_interpreter.operators.UnaryOperators;
+import io.github.dordor12.calculator_interpreter.dtos.enums.CalcTypes;
+import io.github.dordor12.calculator_interpreter.dtos.enums.Operator;
+import io.github.dordor12.calculator_interpreter.dtos.enums.OperatorType;
+import io.github.dordor12.calculator_interpreter.dtos.enums.StatementsTypes;
+import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
+import io.github.dordor12.calculator_interpreter.interperters.OperatorExpressionInterpeter;
+import io.github.dordor12.calculator_interpreter.interperters.StatementInterpeter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,27 +27,51 @@ import lombok.Setter;
 public class TokenMappingFactory {
 
     @Bean
+    public Map<StatementsTypes, StatementInterpeter> getStatementInterpeters(List<StatementInterpeter> statementInterpeters) {
+        return statementInterpeters.stream().collect(Collectors.toMap(StatementInterpeter::getInterperterType, Function.identity()));
+    }
+
+    @Bean
+    public Map<CalcTypes, Map<Operator, OperatorExpressionInterpeter>> getExpressionIterMap(List<OperatorExpressionInterpeter> interpreters) {
+        return interpreters.stream()
+        .collect(Collectors
+        .groupingBy(OperatorExpressionInterpeter::getInterperterType, 
+                    Collectors.toMap(
+                        OperatorExpressionInterpeter::getInterpOperator, 
+                        Function.identity()
+                    )
+        ));
+        }
+
+    @Bean
     public Map<TokenType, CalcTypes> getTypeMapping() {
         return Arrays.stream(CalcTypes.values()).collect(Collectors.toMap(CalcTypes::getValue, Function.identity()));
     }
 
-    @Bean
-    public Map<TokenType, BinaryOperators> getBinaryOperatorsMapping() {
-        return Arrays.stream(BinaryOperators.values()).collect(Collectors.toMap(BinaryOperators::getTokenType, Function.identity()));
+    @Bean("binaryOperatorsMapping")
+    public Map<TokenType, Operator> getBinaryOperatorsMapping() {
+        return Arrays.stream(Operator.values())
+            .filter(op -> op.getOperatorType() == OperatorType.BinaryOperator)
+            .collect(Collectors.toMap(Operator::getTokenType, Function.identity()));
     }
-    @Bean
-    public Map<TokenType, UnaryOperators> getUnaryOperatorsMapping() {
-        return Arrays.stream(UnaryOperators.values()).collect(Collectors.toMap(UnaryOperators::getTokenType, Function.identity()));
+    @Bean("unaryOperatorsMapping")
+    public Map<TokenType, Operator> getUnaryOperatorsMapping() {
+        return Arrays.stream(Operator.values())
+            .filter(op -> op.getOperatorType() == OperatorType.UnaryOperator)
+            .collect(Collectors.toMap(Operator::getTokenType, Function.identity()));
     }
 
-    @Bean
-    public Map<TokenType, PostfixUnaryOperators> getPostfixUnaryOperatorsMapping() {
-        return Arrays.stream(PostfixUnaryOperators.values()).collect(Collectors.toMap(PostfixUnaryOperators::getTokenType, Function.identity()));
+    @Bean("postfixUnaryOperatorsMapping")
+    public Map<TokenType, Operator> getPostfixUnaryOperatorsMapping() {
+        return Arrays.stream(Operator.values())
+            .filter(op -> op.getOperatorType() == OperatorType.PostfixUnaryOperator)
+            .collect(Collectors.toMap(Operator::getTokenType, Function.identity()));
     }
 
     @Bean
     public Map<String, TokenType> createTokenMapping() {
         return Arrays.stream(TokenType.values())
+                .filter(tokenType -> tokenType.getValue() != null)
                 .collect(Collectors.toMap(TokenType::getValue, Function.identity()));
     }
 

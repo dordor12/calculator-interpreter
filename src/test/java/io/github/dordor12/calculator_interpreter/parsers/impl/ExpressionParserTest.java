@@ -1,10 +1,9 @@
 package io.github.dordor12.calculator_interpreter.parsers.impl;
 
-import io.github.dordor12.calculator_interpreter.CalcTypes;
-import io.github.dordor12.calculator_interpreter.Expression;
-import io.github.dordor12.calculator_interpreter.Token;
-import io.github.dordor12.calculator_interpreter.TokenMappingFactory;
-import io.github.dordor12.calculator_interpreter.TokenType;
+import io.github.dordor12.calculator_interpreter.dtos.enums.CalcTypes;import io.github.dordor12.calculator_interpreter.TokenMappingFactory;
+import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
+import io.github.dordor12.calculator_interpreter.dtos.Expression;
+import io.github.dordor12.calculator_interpreter.dtos.Token;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

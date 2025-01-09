@@ -1,27 +1,29 @@
 package io.github.dordor12.calculator_interpreter.parsers.impl;
 
-import io.github.dordor12.calculator_interpreter.CalcTypes;
-import io.github.dordor12.calculator_interpreter.Expression;
-import io.github.dordor12.calculator_interpreter.Token;
-import io.github.dordor12.calculator_interpreter.TokenType;
-import io.github.dordor12.calculator_interpreter.Value;
-import io.github.dordor12.calculator_interpreter.operators.BinaryOperators;
-import io.github.dordor12.calculator_interpreter.operators.PostfixUnaryOperators;
-import io.github.dordor12.calculator_interpreter.operators.UnaryOperators;
+import io.github.dordor12.calculator_interpreter.dtos.enums.CalcTypes;
+import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
+import io.github.dordor12.calculator_interpreter.dtos.Expression;
+import io.github.dordor12.calculator_interpreter.dtos.Token;
+import io.github.dordor12.calculator_interpreter.dtos.Value;
+import io.github.dordor12.calculator_interpreter.dtos.enums.Operator;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class ExpressionParser {
 
-    private final Map<TokenType, UnaryOperators> unaryOperatorsMapping;
-    private final Map<TokenType, BinaryOperators> binaryOperatorsMapping;
-    private final Map<TokenType, PostfixUnaryOperators> postfixUnaryOperatorsMapping;
+    @Qualifier("unaryOperatorsMapping")
+    private final Map<TokenType, Operator> unaryOperatorsMapping;
+    @Qualifier("binaryOperatorsMapping")
+    private final Map<TokenType, Operator> binaryOperatorsMapping;
+    @Qualifier("postfixUnaryOperatorsMapping")
+    private final Map<TokenType, Operator> postfixUnaryOperatorsMapping;
 
     public Expression parse(List<Token> tokens) {
         if (tokens.isEmpty()) {
@@ -45,21 +47,21 @@ public class ExpressionParser {
 
             while (!isAtEnd()) {
                 Token operator = peek();
-                BinaryOperators info = binaryOperatorsMapping.get(operator.getType());
+                Operator operatorInfo = binaryOperatorsMapping.get(operator.getType());
 
                 // If the operator's precedence is less than the current precedence, stop
                 // parsing
-                if (info == null || info.getPriority() < precedence) {
+                if (operatorInfo == null || operatorInfo.getPriority() < precedence) {
                     break;
                 }
 
                 // Advance and parse the right-hand side of the binary operation
                 advance();
-                int nextPrecedence = info.getPriority() + 1;
+                int nextPrecedence = operatorInfo.getPriority() + 1;
                 Expression right = parseExpression(nextPrecedence);
 
                 // Create a binary operation node
-                left = new Expression.BinaryOperator(operator.getType(), left, right);
+                left = new Expression.BinaryOperator(operator.getType(), operatorInfo, left, right);
             }
 
             return left;
@@ -69,9 +71,10 @@ public class ExpressionParser {
         private Expression parseUnary() {
             Token operator = peek();
             if (unaryOperatorsMapping.containsKey(operator.getType())) {
+                var operatorInfo = unaryOperatorsMapping.get(operator.getType());
                 advance();
                 Expression operand = parseUnary(); // Recursively parse the operand
-                return new Expression.UnaryOperator(operator.getType(), operand);
+                return new Expression.UnaryOperator(operator.getType(), operatorInfo, operand);
             }
             return parsePostfix();
         }
@@ -82,8 +85,9 @@ public class ExpressionParser {
             while (!isAtEnd()) {
                 Token operator = peek();
                 if (postfixUnaryOperatorsMapping.containsKey(operator.getType())) {
+                    var operatorInfo = postfixUnaryOperatorsMapping.get(operator.getType());
                     advance();
-                    expr = new Expression.PostfixUnary(operator.getType(), expr);
+                    expr = new Expression.PostfixUnary(operator.getType(), operatorInfo, expr);
                 } else {
                     break;
                 }

@@ -4,13 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import io.github.dordor12.calculator_interpreter.TokenMappingFactory.RecursiveTokenMap;
+import io.github.dordor12.calculator_interpreter.dtos.Token;
+import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+@Service
+@RequiredArgsConstructor
 public class Tokenizer {
     private final RecursiveTokenMap tokenMap;
+
+    public List<Token> tokenize(String source) {
+        return new innerTokenizer(source).tokenize();
+    }
+
+    
+    private class innerTokenizer {
 
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
@@ -18,8 +31,7 @@ public class Tokenizer {
     private int current = 0;
     private int line = 1;
 
-    Tokenizer(String source, @Autowired RecursiveTokenMap tokenMap) {
-        this.tokenMap = tokenMap;
+    innerTokenizer(String source) {
         this.source = source;
     }
 
@@ -132,4 +144,5 @@ public class Tokenizer {
         return new Token(type, text, value, line);
     }
 
+}
 }

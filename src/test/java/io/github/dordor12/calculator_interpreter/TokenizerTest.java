@@ -3,6 +3,8 @@ package io.github.dordor12.calculator_interpreter;
 import org.junit.jupiter.api.Test;
 
 import io.github.dordor12.calculator_interpreter.TokenMappingFactory.RecursiveTokenMap;
+import io.github.dordor12.calculator_interpreter.dtos.Token;
+import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
@@ -15,9 +17,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithSingleCharacterTokens() {
         String source = "+-";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(3, tokens.size());
         assertEquals(TokenType.PLUS, tokens.get(0).getType());
@@ -28,9 +30,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithMultiCharacterTokens() {
         String source = "++ --";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(3, tokens.size());
         assertEquals(TokenType.PLUS_PLUS, tokens.get(0).getType());
@@ -41,9 +43,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithNumbers() {
         String source = "123 45.67";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(3, tokens.size());
         assertEquals(TokenType.NUMBER, tokens.get(0).getType());
@@ -56,9 +58,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithIdentifiers() {
         String source = "abc def";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(3, tokens.size());
         assertEquals(TokenType.IDENTIFIER, tokens.get(0).getType());
@@ -71,9 +73,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithUnexpectedCharacter() {
         String source = "@";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(1, tokens.size());
         assertEquals(TokenType.EOF, tokens.get(0).getType());
@@ -82,9 +84,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithMultilineString() {
         String source = "abc\ndef";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(4, tokens.size());
         assertEquals(TokenType.IDENTIFIER, tokens.get(0).getType());
@@ -98,9 +100,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithMixedContent() {
         String source = "abc 123 + - def 45.67";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(7, tokens.size());
         assertEquals(TokenType.IDENTIFIER, tokens.get(0).getType());
@@ -119,9 +121,9 @@ public class TokenizerTest {
     @Test
     public void testScanTokensWithPlusPlusNearIdentifier() {
         String source = "abc++";
-        Tokenizer tokenizer = new Tokenizer(source, tokenMap);
+        Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize();
+        List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(3, tokens.size());
         assertEquals(TokenType.IDENTIFIER, tokens.get(0).getType());

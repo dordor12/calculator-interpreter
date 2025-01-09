@@ -1,4 +1,4 @@
-package io.github.dordor12.calculator_interpreter;
+package io.github.dordor12.calculator_interpreter.dtos.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
