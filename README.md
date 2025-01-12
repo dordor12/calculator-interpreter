@@ -30,8 +30,8 @@ The `calculator-interpreter` is a Java-based interpreter for evaluating mathemat
 ### Running the Application
 To run the application, use the following command:
 ```sh
-gradlew bootRun --args=path_to_tour_file
-gradlew bootRun --args="./src/main/resources/test.txt"
+./gradlew bootRun --args=path_to_tour_file
+./gradlew bootRun --args="./src/main/resources/test.txt"
 ```
 
 ### Example Input File
@@ -42,4 +42,57 @@ x = -(i + --j) * 2 - --j
 result = 4 + + - + - - 6 + - + - ++i - - - + 3 * 2
 i = 7 * 4 / 3
 c = (3 * (2 + (1 * (2 + 3))))
+```
+
+### Running test
+```sh
+./gradlew test
+```
+
+### Extending the Project to Handle More Operators
+To extend the project to handle more operators, follow these steps:
+
+1. Define the new token that need to parse:
+```java
+public enum TokenType {
+    PLUS("+"),
+    MINUS("-"),
+    ...
+    // add new token here
+    PRECENT("%") // Example new token
+}
+```
+
+2. Define the new operator in the `Operator` enum:
+
+```java
+public enum Operator {
+    BINARY_ADDITION(OperatorType.BinaryOperator, TokenType.PLUS, 1),
+    BINARY_SUBTRACTION(OperatorType.BinaryOperator, TokenType.MINUS, 2),
+    ....
+      // Add new operators here
+    BINARY_MODULUS(OperatorType.BinaryOperator, TokenType.PRECENT, 2) // Example new operator
+  
+}
+```
+
+3. create the interpeter for this operator
+
+```java
+
+@Component
+public class DivisionExpressionIntr extends NumberExprIntr {
+    @Override
+    public Operator getInterpOperator() {
+        return Operator.BINARY_MODULUS; // retun the type that this class intrepert
+    }
+
+    @Override
+    public Value interpert(Expression expression, BiFunction<Expression, CalcTypes, Value> recusiveInterp) {
+        var binary = (BinaryOperator) expression;
+        var left = (float) recusiveInterp.apply(binary.getLeft(), getInterperterType()).getValue();
+        var right = (float) recusiveInterp.apply(binary.getRight(), getInterperterType()).getValue();
+        return new Value(CalcTypes.NUMBER, left % right); // actual logic here
+    }    
+}
 ```
