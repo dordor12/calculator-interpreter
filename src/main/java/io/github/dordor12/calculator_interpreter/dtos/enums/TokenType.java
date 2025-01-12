@@ -18,7 +18,7 @@ public enum TokenType {
     MINUS_EQUALS("-="),
     PLUS_PLUS("++"),
     MINUS_MINUS("--"),
-    NEW_LINE("\n"),
+    NEW_LINE(null),
     IDENTIFIER(null),
     EOF(null);
 

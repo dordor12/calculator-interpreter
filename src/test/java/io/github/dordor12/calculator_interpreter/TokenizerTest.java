@@ -2,7 +2,8 @@ package io.github.dordor12.calculator_interpreter;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.dordor12.calculator_interpreter.TokenMappingFactory.RecursiveTokenMap;
+import io.github.dordor12.calculator_interpreter.configurations.TokenMappingFactory;
+import io.github.dordor12.calculator_interpreter.configurations.TokenMappingFactory.RecursiveTokenMap;
 import io.github.dordor12.calculator_interpreter.dtos.Token;
 import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
 
@@ -57,16 +58,16 @@ public class TokenizerTest {
 
     @Test
     public void testScanTokensWithIdentifiers() {
-        String source = "abc def";
+        String source = "ab1c Def";
         Tokenizer tokenizer = new Tokenizer(tokenMap);
 
         List<Token> tokens = tokenizer.tokenize(source);
 
         assertEquals(3, tokens.size());
         assertEquals(TokenType.IDENTIFIER, tokens.get(0).getType());
-        assertEquals("abc", tokens.get(0).getStringValue());
+        assertEquals("ab1c", tokens.get(0).getStringValue());
         assertEquals(TokenType.IDENTIFIER, tokens.get(1).getType());
-        assertEquals("def", tokens.get(1).getStringValue());
+        assertEquals("Def", tokens.get(1).getStringValue());
         assertEquals(TokenType.EOF, tokens.get(2).getType());
     }
 
@@ -75,15 +76,12 @@ public class TokenizerTest {
         String source = "@";
         Tokenizer tokenizer = new Tokenizer(tokenMap);
 
-        List<Token> tokens = tokenizer.tokenize(source);
-
-        assertEquals(1, tokens.size());
-        assertEquals(TokenType.EOF, tokens.get(0).getType());
+        assertThrows(IllegalArgumentException.class, () -> tokenizer.tokenize(source));
     }
 
     @Test
     public void testScanTokensWithMultilineString() {
-        String source = "abc\ndef";
+        String source = "abc\r\ndef";
         Tokenizer tokenizer = new Tokenizer(tokenMap);
 
         List<Token> tokens = tokenizer.tokenize(source);

@@ -87,6 +87,10 @@ public class ExpressionParser {
                 if (postfixUnaryOperatorsMapping.containsKey(operator.getType())) {
                     var operatorInfo = postfixUnaryOperatorsMapping.get(operator.getType());
                     advance();
+                     // After a postfix operator, an open parenthesis is not valid
+                    if (isNextTokenIsParentheses()) {
+                         throw new IllegalArgumentException("Invalid syntax: Postfix operators cannot be followed by '(' without an explicit operator.");
+                    }
                     expr = new Expression.PostfixUnary(operator.getType(), operatorInfo, expr);
                 } else {
                     break;
@@ -96,14 +100,24 @@ public class ExpressionParser {
             return expr;
         }
 
+        private boolean isNextTokenIsParentheses() {
+            return !isAtEnd() && peek().getType() == TokenType.OPEN_PARENTHESES;
+        }
+
         // Parse primary expressions (literals, variables, or parenthesized expressions)
         private Expression parsePrimary() {
             if (match(TokenType.NUMBER)) {
                 var value = new Value(CalcTypes.NUMBER, previous().getValue());
+                if (isNextTokenIsParentheses()) {
+                    throw new IllegalArgumentException("Invalid syntax: Postfix operators cannot be followed by '(' without an explicit operator.");
+                }
                 return new Expression.Literal(value);
             }
 
             if (match(TokenType.IDENTIFIER)) {
+                if (isNextTokenIsParentheses()) {
+                    throw new IllegalArgumentException("Invalid syntax: Postfix operators cannot be followed by '(' without an explicit operator.");
+                }
                 return new Expression.Variable(previous().getStringValue());
             }
 
@@ -113,7 +127,7 @@ public class ExpressionParser {
                 return expr;
             }
 
-            throw new RuntimeException("Expected expression.");
+            throw new IllegalArgumentException("Expected expression.");
         }
 
         // Utility methods for parsing
@@ -128,10 +142,10 @@ public class ExpressionParser {
         }
 
         private Token consume(TokenType type, String message) {
-            if (peek().getType() == type) {
-                return advance();
+            if (isAtEnd() || peek().getType() != type) {
+                throw new IllegalArgumentException(message);
             }
-            throw new RuntimeException(message);
+            return advance();
         }
 
         private boolean isAtEnd() {

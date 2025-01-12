@@ -12,6 +12,8 @@ public class Value {
 
     @Override
     public String toString() {
-        return value.toString();
+        var str = value.toString();
+        if (str.endsWith(".0")) return str.substring(0, str.length() -2);
+        return str;
     }
 }

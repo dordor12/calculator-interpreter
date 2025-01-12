@@ -3,15 +3,12 @@ package io.github.dordor12.calculator_interpreter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.github.dordor12.calculator_interpreter.TokenMappingFactory.RecursiveTokenMap;
+import io.github.dordor12.calculator_interpreter.configurations.TokenMappingFactory.RecursiveTokenMap;
 import io.github.dordor12.calculator_interpreter.dtos.Token;
 import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -58,17 +55,19 @@ public class Tokenizer {
                 c = advance();
                 map = map.getMap().get(c);
             }
-            if (map.getTokenType().equals(TokenType.NEW_LINE)) {
-                line++;
-            }
             token = createToken(map.getTokenType());
         } else {
             if (isDigit(c)) {
                 token = number();
             } else if (isAlpha(c)) {
                 token = identifier();
-            } else {
-                // log.error("Unexpected character. line: " + line, " char: " + c);
+            } else if (c == Character.LINE_SEPARATOR) {
+                line++;
+                token = createToken(TokenType.NEW_LINE);
+            } else if (c == ' ' || c == '\n' ) { //skip spaces
+                return token;
+            }else {
+                throw new IllegalArgumentException("Unexpected character. line: " + line +" char: " + c);
             }
         }
         return token;

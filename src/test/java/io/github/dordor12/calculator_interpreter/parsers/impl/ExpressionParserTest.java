@@ -1,7 +1,8 @@
 package io.github.dordor12.calculator_interpreter.parsers.impl;
 
-import io.github.dordor12.calculator_interpreter.dtos.enums.CalcTypes;import io.github.dordor12.calculator_interpreter.TokenMappingFactory;
+import io.github.dordor12.calculator_interpreter.dtos.enums.CalcTypes;
 import io.github.dordor12.calculator_interpreter.dtos.enums.TokenType;
+import io.github.dordor12.calculator_interpreter.configurations.ParserMappingFactory;
 import io.github.dordor12.calculator_interpreter.dtos.Expression;
 import io.github.dordor12.calculator_interpreter.dtos.Token;
 
@@ -13,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ExpressionParserTest {
-    private static TokenMappingFactory tokenMappingFactory = new TokenMappingFactory();
+    private static ParserMappingFactory ParserMappingFactory = new ParserMappingFactory();
     private static ExpressionParser parser;
 
     @BeforeAll
     public static void setUp() {
-        parser = new ExpressionParser(tokenMappingFactory.getUnaryOperatorsMapping(), tokenMappingFactory.getBinaryOperatorsMapping(), tokenMappingFactory.getPostfixUnaryOperatorsMapping());
+        parser = new ExpressionParser(ParserMappingFactory.getUnaryOperatorsMapping(), ParserMappingFactory.getBinaryOperatorsMapping(), ParserMappingFactory.getPostfixUnaryOperatorsMapping());
     }
 
     @Test
@@ -136,6 +137,78 @@ public class ExpressionParserTest {
         assertEquals(3.0, ((Expression.Literal) a.getLeft()).getValue().getValue());
         assertEquals(5.0, ((Expression.Literal) a.getRight()).getValue().getValue());
     }
+
+    @Test
+    public void testExpressionStartWithNumberMultiply() {
+        List<Token> tokens = List.of(
+            new Token(TokenType.NUMBER, "3", 3.0, 1),
+            new Token(TokenType.MULTIPLY, "*", null, 1),
+            new Token(TokenType.NUMBER, "5", 5.0, 1)
+        );
+        Expression result = parser.parse(tokens);
+        assertTrue(result instanceof Expression.BinaryOperator);
+        var a = (Expression.BinaryOperator) result;
+        assertEquals(TokenType.MULTIPLY, ((Expression.BinaryOperator) result).getTokenType());
+        assertTrue(((Expression.BinaryOperator) result).getLeft() instanceof Expression.Literal);
+        assertTrue(((Expression.BinaryOperator) result).getRight() instanceof Expression.Literal);
+        assertEquals(3.0, ((Expression.Literal) a.getLeft()).getValue().getValue());
+        assertEquals(5.0, ((Expression.Literal) a.getRight()).getValue().getValue());
+    }
+
+    @Test //-3+*5
+    public void testInvalidBinaryOperator() {
+        List<Token> tokens = List.of(
+            new Token(TokenType.MINUS, "-", null, 1),
+            new Token(TokenType.NUMBER, "3", 3.0, 1),
+            new Token(TokenType.PLUS, "+", null, 1),
+            new Token(TokenType.MULTIPLY, "*", null, 1),
+            new Token(TokenType.NUMBER, "5", 5.0, 1)
+        );
+        assertThrows(IllegalArgumentException.class, () -> parser.parse(tokens));
+    }
+
+    @Test //4(2+1)
+    public void testLiteralNextToParentheses() {
+        List<Token> tokens = List.of(
+            new Token(TokenType.NUMBER, "4", 4.0, 1),
+            new Token(TokenType.OPEN_PARENTHESES, "(", null, 1),
+            new Token(TokenType.NUMBER, "2", 2.0, 1),
+            new Token(TokenType.PLUS, "+", null, 1),
+            new Token(TokenType.NUMBER, "1", 1.0, 1),
+            new Token(TokenType.CLOSE_PARENTHESES, ")", null, 1)
+        );
+        assertThrows(IllegalArgumentException.class, () -> parser.parse(tokens));
+
+    }
+
+    @Test //4(2+1)
+    public void testVarNextToParentheses() {
+        List<Token> tokens = List.of(
+            new Token(TokenType.IDENTIFIER, "i", null, 1),
+            new Token(TokenType.OPEN_PARENTHESES, "(", null, 1),
+            new Token(TokenType.NUMBER, "2", 2.0, 1),
+            new Token(TokenType.PLUS, "+", null, 1),
+            new Token(TokenType.NUMBER, "1", 1.0, 1),
+            new Token(TokenType.CLOSE_PARENTHESES, ")", null, 1)
+        );
+        assertThrows(IllegalArgumentException.class, () -> parser.parse(tokens));
+
+    }
+
+    @Test //i++(2+1)
+    public void testPostUnnaryNextToParentheses() {
+        List<Token> tokens = List.of(
+            new Token(TokenType.IDENTIFIER, "i", null, 1),
+            new Token(TokenType.PLUS_PLUS, "++", null, 1),
+            new Token(TokenType.OPEN_PARENTHESES, "(", null, 1),
+            new Token(TokenType.NUMBER, "2", 2.0, 1),
+            new Token(TokenType.PLUS, "+", null, 1),
+            new Token(TokenType.NUMBER, "1", 1.0, 1),
+            new Token(TokenType.CLOSE_PARENTHESES, ")", null, 1)
+        );
+        assertThrows(IllegalArgumentException.class, () -> parser.parse(tokens));
+    }
+
 
     @Test // -3 + (4 * -(5 + 2) + x)
     public void testComplexExpression() {

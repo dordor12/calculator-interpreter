@@ -31,7 +31,7 @@ public class PostfixPlusPlusExpressionIntr extends NumberExprIntr {
             var variable = (Expression.Variable) unary.getExpression();
             environment.setVariable(variable.getName(), new Value(CalcTypes.NUMBER, ++operand));
         } else {
-            throw new RuntimeException("can't decrement non variable");
+            throw new RuntimeException("can't increment non variable");
         }
         return value;
     }    
