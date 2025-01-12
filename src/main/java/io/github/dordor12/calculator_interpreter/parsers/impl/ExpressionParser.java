@@ -109,14 +109,14 @@ public class ExpressionParser {
             if (match(TokenType.NUMBER)) {
                 var value = new Value(CalcTypes.NUMBER, previous().getValue());
                 if (isNextTokenIsParentheses()) {
-                    throw new IllegalArgumentException("Invalid syntax: Postfix operators cannot be followed by '(' without an explicit operator.");
+                    throw new IllegalArgumentException("Invalid syntax: Numbers cannot be followed by '(' without an explicit operator.");
                 }
                 return new Expression.Literal(value);
             }
 
             if (match(TokenType.IDENTIFIER)) {
                 if (isNextTokenIsParentheses()) {
-                    throw new IllegalArgumentException("Invalid syntax: Postfix operators cannot be followed by '(' without an explicit operator.");
+                    throw new IllegalArgumentException("Invalid syntax: Variables cannot be followed by '(' without an explicit operator.");
                 }
                 return new Expression.Variable(previous().getStringValue());
             }
